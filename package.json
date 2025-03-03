@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "start": "nodemon -e js,json,graphql --exec node src/index.js"
+  },
+  "dependencies": {
+    "apollo-server": "^3.13.0",
+    "graphql": "^16.10.0",
+    "nodemon": "^3.1.9"
+  }
+}
