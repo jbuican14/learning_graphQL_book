@@ -27,6 +27,7 @@ type Photo {
   description: String,
   category: PhotoCategory!
   postedBy: User!
+  taggedUsers: [User!]!
 }
 
 type Query {
@@ -76,6 +77,13 @@ var photos = [
   },
 ];
 
+var tags = [
+  { photoID: '1', userID: 'user1' },
+  { photoID: '2', userID: 'user2' },
+  { photoID: '2', userID: 'user3' },
+  { photoID: '2', userID: 'user4' },
+];
+
 const resolvers = {
   Query: {
     totalPhotos: () => photos.length,
@@ -96,6 +104,7 @@ const resolvers = {
   Photo: {
     url: (parent) => `http://example.com/img/${parent.id}.jpg`,
     postedBy: (parent) => {
+      // console.log('🚀 ~ parent:', parent);
       return users.find((u) => u.githubLogin === parent.githubUser);
     },
   },

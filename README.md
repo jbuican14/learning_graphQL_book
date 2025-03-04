@@ -41,3 +41,25 @@ mutation newPhoto($input: PostPhotoInput!) {
   }
 }
 ```
+
+from input type photo and add dummy data, we can query using
+
+```
+mutation newPhoto( $input: PostPhotoInput!) {
+  postPhoto(input:$input) {
+    id
+    name
+    url
+    description
+    category
+  }
+}
+
+// and variables
+{
+  "input": {
+    "name": "A sample A",
+  "description": " A Sample Photo for Our Dataset"
+  }
+}
+```
