@@ -29,3 +29,15 @@ mutation newPhoto( $name: String!, $description: String) {
 ```
 
 This query fetches the title of the book with ID 1 and the name of its author.
+
+when adding input type we do mutation as example
+
+```
+mutation newPhoto($input: PostPhotoInput!) {
+  postPhoto(input: $input) {
+    id
+    url
+    created
+  }
+}
+```
