@@ -10,6 +10,15 @@ enum PhotoCategory {
   MARCRO
 }
 
+#type user definition
+type User {
+  githubLogin: ID!
+  name: String
+  avatar: String
+  postedPhotos: [Photo!]!
+  inPhotos: [Photo!]!
+}
+
 # Photo type definition
 type Photo {
   id: ID!
@@ -17,6 +26,7 @@ type Photo {
   name: String!
   description: String,
   category: PhotoCategory!
+  postedBy: User!
 }
 
 type Query {
@@ -36,7 +46,35 @@ type Mutation {
 `;
 
 var _id = 0; // private variable to mock database id generation
-var photos = [];
+// var photos = [];
+// testing only
+var users = [
+  { githubLogin: 'user1', name: 'Foo bar' },
+  { githubLogin: 'user2', name: 'Jenny' },
+  { githubLogin: 'user3', name: 'Any Amy' },
+];
+var photos = [
+  {
+    id: '1',
+    name: 'Dropping the Heart Chute',
+    description: 'The heart chute is one of my favorite chutes',
+    category: 'ACTION',
+    githubUser: 'user1',
+  },
+  {
+    id: '2',
+    name: 'Enjoying the sunshine',
+    category: 'SELFIE',
+    githubUser: 'user2',
+  },
+  {
+    id: '3',
+    name: 'Gunbarrel 25',
+    description: '25 laps on gunbarrel today',
+    category: 'LANDSCAPE',
+    githubUser: 'user3',
+  },
+];
 
 const resolvers = {
   Query: {
