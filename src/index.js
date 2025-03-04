@@ -34,7 +34,7 @@ type Query {
   allPhotos: [Photo!]!
 }
 
-type PostPhotoInput { # input type like ts interface
+input PostPhotoInput { # input type like ts interface
   name: String!
   category: PhotoCategory=PORTRAIT
   description: String
@@ -95,6 +95,19 @@ const resolvers = {
   },
   Photo: {
     url: (parent) => `http://example.com/img/${parent.id}.jpg`,
+    postedBy: (parent) => {
+      return users.find((u) => u.githubLogin === parent.githubUser);
+    },
+  },
+  User: {
+    postedPhotos: (parent) => {
+      return photos.filter((p) => p.githubUser === parent.githubLogin);
+    },
+    inPhotos: (parent) => {
+      return tags
+        .filter((tag) => tag.photoID === parent.id)
+        .map((tag) => tag.photoID);
+    },
   },
 };
 
