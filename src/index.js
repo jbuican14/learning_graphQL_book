@@ -81,7 +81,7 @@ var tags = [
   { photoID: '1', userID: 'user1' },
   { photoID: '2', userID: 'user2' },
   { photoID: '2', userID: 'user3' },
-  { photoID: '2', userID: 'user4' },
+  { photoID: '2', userID: 'user3' },
 ];
 
 const resolvers = {
@@ -107,6 +107,12 @@ const resolvers = {
       // console.log('🚀 ~ parent:', parent);
       return users.find((u) => u.githubLogin === parent.githubUser);
     },
+    taggedUsers: (parent) => {
+      return tags
+        .filter((tag) => tag.photoID === parent.id) // filter tags for the current photo
+        .map((tag) => tag.userID) // map the userIDs to an array of userIDs
+        .map((userID) => users.find((u) => u.githubLogin === userID)); // map the userIDs to user objects
+    },
   },
   User: {
     postedPhotos: (parent) => {
@@ -114,8 +120,9 @@ const resolvers = {
     },
     inPhotos: (parent) => {
       return tags
-        .filter((tag) => tag.photoID === parent.id)
-        .map((tag) => tag.photoID);
+        .filter((tag) => tag.photoID === parent.id) // filter all tags to find the ones where the photo was taken by the current user
+        .map((tag) => tag.photoID) // map the photoIDs to an array of photoIDs
+        .map((photoID) => photos.find((p) => p.id === photoID)); // map the photoIDs to photo objects
     },
   },
 };

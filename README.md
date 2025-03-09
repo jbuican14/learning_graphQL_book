@@ -63,3 +63,13 @@ mutation newPhoto( $input: PostPhotoInput!) {
   }
 }
 ```
+
+to query users who are tagged in every photo
+
+```
+query listPhotos { allPhotos {
+url taggedUsers {
+name }
+} }
+
+```
