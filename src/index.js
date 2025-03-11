@@ -1,6 +1,8 @@
 const { ApolloServer } = require('apollo-server');
 
 const typeDefs = `
+scalar DateTime
+
 # enum definition
 enum PhotoCategory {
   SELFIE
@@ -28,11 +30,12 @@ type Photo {
   category: PhotoCategory!
   postedBy: User!
   taggedUsers: [User!]!
+  created: DateTime!
 }
 
 type Query {
   totalPhotos: Int!
-  allPhotos: [Photo!]!
+  allPhotos(after: DateTime): [Photo!]!
 }
 
 input PostPhotoInput { # input type like ts interface
@@ -83,6 +86,12 @@ var tags = [
   { photoID: '2', userID: 'user3' },
   { photoID: '2', userID: 'user3' },
 ];
+
+var date = new Date('03/11/2025');
+
+const serializeDate = (date) => {
+  return date.toISOString();
+};
 
 const resolvers = {
   Query: {
