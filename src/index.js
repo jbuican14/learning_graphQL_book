@@ -1,4 +1,5 @@
 const { ApolloServer } = require('apollo-server');
+const { GraphQLScalarType } = require('graphql');
 
 const typeDefs = `
 scalar DateTime
@@ -64,12 +65,14 @@ var photos = [
     description: 'The heart chute is one of my favorite chutes',
     category: 'ACTION',
     githubUser: 'user1',
+    created: '3-28-2005',
   },
   {
     id: '2',
     name: 'Enjoying the sunshine',
     category: 'SELFIE',
     githubUser: 'user2',
+    created: '3-28-1977',
   },
   {
     id: '3',
@@ -77,6 +80,7 @@ var photos = [
     description: '25 laps on gunbarrel today',
     category: 'LANDSCAPE',
     githubUser: 'user3',
+    created: '3-28-2006',
   },
 ];
 
@@ -96,7 +100,11 @@ const serializeDate = (date) => {
 const resolvers = {
   Query: {
     totalPhotos: () => photos.length,
-    allPhotos: () => photos,
+    allPhotos: (parent, args) => {
+      console.log('🚀 ~ args:', args);
+      args.after;
+      return photos;
+    },
   },
   Mutation: {
     postPhoto(parent, args) {
@@ -134,6 +142,16 @@ const resolvers = {
         .map((photoID) => photos.find((p) => p.id === photoID)); // map the photoIDs to photo objects
     },
   },
+
+  DateTime: new GraphQLScalarType({
+    name: 'DateTime',
+    description: 'A valid date time value.',
+    parseValue: (value) => new Date(value),
+    serialize: (val) => new Date(val).toISOString(),
+    parseLiteral: (ast) => {
+      return ast.value;
+    },
+  }),
 };
 
 const server = new ApolloServer({
