@@ -1,6 +1,7 @@
 const express = require('express');
 const { GraphQLScalarType } = require('graphql');
 const { ApolloServer } = require('apollo-server-express');
+const expressPlayground = require('graphql-playground-middleware-express');
 
 const typeDefs = `
 scalar DateTime
@@ -177,6 +178,8 @@ async function startApolloServer() {
   app.get('/', (req, res) =>
     res.end('Welcome to the PhotoShare API using express')
   );
+
+  app.get('/playground', expressPlayground({ endpoint: '/graphql' }));
 
   const PORT = process.env.PORT || 4000;
   app.listen({ port: PORT }, () => {
