@@ -2,55 +2,9 @@ const express = require('express');
 const { GraphQLScalarType } = require('graphql');
 const { ApolloServer } = require('apollo-server-express');
 const expressPlayground = require('graphql-playground-middleware-express');
-
-const typeDefs = `
-scalar DateTime
-
-# enum definition
-enum PhotoCategory {
-  SELFIE
-  PORTRAIT
-  NIGHT
-  LANDSCAPE
-  MARCRO
-}
-
-#type user definition
-type User {
-  githubLogin: ID!
-  name: String
-  avatar: String
-  postedPhotos: [Photo!]!
-  inPhotos: [Photo!]!
-}
-
-# Photo type definition
-type Photo {
-  id: ID!
-  url: String!
-  name: String!
-  description: String,
-  category: PhotoCategory!
-  postedBy: User!
-  taggedUsers: [User!]!
-  created: DateTime!
-}
-
-type Query {
-  totalPhotos: Int!
-  allPhotos(after: DateTime): [Photo!]!
-}
-
-input PostPhotoInput { # input type like ts interface
-  name: String!
-  category: PhotoCategory=PORTRAIT
-  description: String
-}
-
-type Mutation {
-  postPhoto(input: PostPhotoInput!): Photo!
-}
-`;
+const { readFileSync } = require('fs');
+const typeDefs = readFileSync('./typeDefs.graphql', 'UTF-8');
+const { typeDefs } = require('./schema'); // import the schema from schema.js
 
 var _id = 0; // private variable to mock database id generation
 // var photos = [];
@@ -99,63 +53,6 @@ const serializeDate = (date) => {
   return date.toISOString();
 };
 
-const resolvers = {
-  Query: {
-    totalPhotos: () => photos.length,
-    allPhotos: (parent, args) => {
-      console.log('🚀 ~ args:', args);
-      args.after;
-      return photos;
-    },
-  },
-  Mutation: {
-    postPhoto(parent, args) {
-      // new photo created with generated id
-      // spread the name and description fields from args into new photo object
-      var newPhoto = {
-        id: _id++,
-        ...args.input,
-        created: new Date(),
-      };
-      photos.push(newPhoto);
-      return newPhoto;
-    },
-  },
-  Photo: {
-    url: (parent) => `http://example.com/img/${parent.id}.jpg`,
-    postedBy: (parent) => {
-      // console.log('🚀 ~ parent:', parent);
-      return users.find((u) => u.githubLogin === parent.githubUser);
-    },
-    taggedUsers: (parent) => {
-      return tags
-        .filter((tag) => tag.photoID === parent.id) // filter tags for the current photo
-        .map((tag) => tag.userID) // map the userIDs to an array of userIDs
-        .map((userID) => users.find((u) => u.githubLogin === userID)); // map the userIDs to user objects
-    },
-  },
-  User: {
-    postedPhotos: (parent) => {
-      return photos.filter((p) => p.githubUser === parent.githubLogin);
-    },
-    inPhotos: (parent) => {
-      return tags
-        .filter((tag) => tag.photoID === parent.id) // filter all tags to find the ones where the photo was taken by the current user
-        .map((tag) => tag.photoID) // map the photoIDs to an array of photoIDs
-        .map((photoID) => photos.find((p) => p.id === photoID)); // map the photoIDs to photo objects
-    },
-  },
-
-  DateTime: new GraphQLScalarType({
-    name: 'DateTime',
-    description: 'A valid date time value.',
-    parseValue: (value) => new Date(value),
-    serialize: (val) => new Date(val).toISOString(),
-    parseLiteral: (ast) => {
-      return ast.value;
-    },
-  }),
-};
 const server = new ApolloServer({
   typeDefs,
   resolvers,
